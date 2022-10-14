@@ -131,14 +131,14 @@ function setSwitches(b) {
 }
 
 function refreshNodesMenu() {
-    nodesMenu.removeAll();
+    nodesMenu.menu.removeAll();
     nodes.forEach( (node) => {
-        let item = new PopupMenu.PopupMenuItem(node.line)
+        var item = new PopupMenu.PopupMenuItem(node.line)
         item.connect('activate', () => {
             St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, node.address);
             Main.notify("Copied " + node.address + " to clipboard! (" + node.name + ")");
         });
-        nodesMenu.actor.add_child( item );
+        nodesMenu.menu.addMenuItem(item);
     });
 }
 
@@ -147,7 +147,7 @@ function refreshExitNodesMenu() {
     var uses_exit = false;
     nodes.forEach( (node) => {
         if (node.offersExit) {
-        var item = new PopupMenu.PopupMenuItem(node.name)
+        var item = new PopupMenu.PopupMenuItem(node.line)
         item.connect('activate', () => {
             cmdTailscale(["up", "--exit-node="+item.label.text, "--reset"])
         });
@@ -361,9 +361,11 @@ const TailscalePopup = GObject.registerClass(
             this.menu.addMenuItem( new PopupMenu.PopupSeparatorMenuItem());
             
             // ------ NODES ------
-            nodesMenu = new PopupMenu.PopupMenuSection();
+            nodesMenu = new PopupMenu.PopupSubMenuMenuItem("Nodes");
+
             nodes.forEach( (node) => {
-                nodesMenu.actor.add_child( new PopupMenu.PopupMenuItem(node.line) );
+                nodesMenu.menu.addMenuItem( new PopupMenu.PopupMenuItem(node.line) );
+                log.info("Added node" + node.line);
             });
             this.menu.addMenuItem(nodesMenu);
 
@@ -430,7 +432,8 @@ const TailscalePopup = GObject.registerClass(
             let aboutMenu = new PopupMenu.PopupSubMenuMenuItem("About");
             this.menu.addMenuItem(aboutMenu);
             aboutMenu.menu.addMenuItem(new PopupMenu.PopupMenuItem("The Tailscale Status extension is in no way affiliated with Tailscale Inc."));
-            aboutMenu.menu.addMenuItem(new PopupMenu.PopupMenuItem("Open an issue or pull request at github.com/maxgallup/tailscale-status"));
+            aboutMenu.menu.addMenuItem(new PopupMenu.PopupMenuItem("Open an issue or pull request at github.com/magavdraakon/tailscale-status"));
+            aboutMenu.menu.addMenuItem(new PopupMenu.PopupMenuItem("OR to origininal project: Open an issue or pull request at github.com/maxgallup/tailscale-status"));
 
         }
     }
